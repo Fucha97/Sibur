@@ -11,13 +11,12 @@
 function queryDecorator(callback, count, timeout) {
   let currentCount = count;
   return function retryFetch(id) {
+    if (currentCount < 0) return;
     try {
-      if (currentCount > 0) {
-        callback(id);
-      }
+      callback.call(fetchObject, id);
     } catch (error) {
       currentCount -= 1;
-      setTimeout(retryFetch, timeout, id);
+      setTimeout(retryFetch(id), timeout);
     }
   };
 }
