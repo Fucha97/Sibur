@@ -10,13 +10,14 @@
 
 function queryDecorator(callback, count, timeout) {
   let currentCount = count;
-  return function retryFetch(id) {
-    if (currentCount < 0) return;
+  return function retryFetch(arg) {
     try {
-      callback.call(fetchObject, id);
+      if (currentCount) {
+        callback.call(fetchObject, arg);
+      }
     } catch (error) {
       currentCount -= 1;
-      setTimeout(retryFetch(id), timeout);
+      setTimeout(retryFetch, timeout, arg);
     }
   };
 }
