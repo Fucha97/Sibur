@@ -8,21 +8,18 @@
 // количество повторов при неудачном запросе
 // интервал между повторами
 
-function queryDecorator(func, count, timeout) {
+function queryDecorator(callback, count, timeout) {
   let currentCount = count;
-  const retryFetch = function (arg) {
+  return function retryFetch(id) {
     try {
-      func.call(fetchObject, arg);
+      if (currentCount > 0) {
+        callback(id);
+      }
     } catch (error) {
-      currentCount--;
-      sleep(timeout).then(() => {
-        if (currentCount) {
-          retryFetch(arg);
-        }
-      });
+      currentCount -= 1;
+      setTimeout(retryFetch, timeout, id);
     }
   };
-  return retryFetch;
 }
 
 const fetchObject = {
